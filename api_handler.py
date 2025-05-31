@@ -7,7 +7,11 @@ API_URL = os.getenv("API_URL")
 
 def get_movie_by_title(name):
     try:
-        print(API_URL + "?apikey=" + API_KEY + "&t=" + name)
+        if not name:
+            print("Please enter a movie title.")
+            return
+
+        #print(API_URL + "?apikey=" + API_KEY + "&t=" + name)
 
         req = requests.get(API_URL + "?apikey=" + API_KEY + "&t=" + name)
         result = req.json()

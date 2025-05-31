@@ -1,3 +1,4 @@
+import sys
 import textwrap
 from colorama import init, Fore, Style
 #from storage_manager import get_movies
@@ -16,6 +17,7 @@ def main():
     #movies_db = get_movies()
 
     actions = {
+        "0": sys.exit,
         "1": lambda: list_movies(),
         "2": lambda: storage.add_movie(
             input(f"{Style.BRIGHT}{Fore.YELLOW}Enter the new movie name: "),
@@ -23,7 +25,7 @@ def main():
         "3": lambda: storage.delete_movie(
             input(f"{Style.BRIGHT}{Fore.YELLOW}Enter the movie name to delete: ")
         ),
-        "4": lambda: update_movie(
+        "4": lambda: storage.update_movie(
             input(f"{Style.BRIGHT}{Fore.YELLOW}Enter movie name: "),
             float(input(f"{Style.BRIGHT}{Fore.YELLOW}Enter new movie rating (0-10): "))
         ),
@@ -34,7 +36,8 @@ def main():
         "9": lambda: (
             filename := input(f"{Style.BRIGHT}{Fore.YELLOW}Enter filename to save the histogram (e.g. ratings.png): "),
             create_rating_histogram(movies_db, filename if filename else "ratings.png")
-        )
+        ),
+        "10": lambda: generate_website()
     }
 
     print(f"{Style.BRIGHT}{Fore.MAGENTA}********** My Movies Database **********")
@@ -51,6 +54,7 @@ def main():
     7. Search movie
     8. Movies sorted by rating
     9. Create Rating Histogram
+    10. Generate website
     """)
 
     while True:
@@ -58,9 +62,7 @@ def main():
         user_choice = input(f"{Style.BRIGHT}{Fore.YELLOW}Enter choice (1-9): ")
         print()
 
-        if user_choice == "0":
-            break
-        elif user_choice in actions:
+        if user_choice in actions:
             try:
                 action_to_run = actions[user_choice]
                 action_to_run()

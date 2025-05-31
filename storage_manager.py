@@ -33,10 +33,13 @@ def get_movies():
 def add_movie(title):
     """Add a new movie to the database."""
 
-    movie_data = get_movie_by_title(title)
+    movie = get_movie_by_title(title)
 
-    if movie_data:
-        title, year, rating, image_url = get_movie_by_title(title)
+    if movie:
+        title = movie["Title"]
+        year = movie["Year"]
+        rating = movie["imdbRating"]
+        image_url = movie["Poster"]
     else:
         return
 
