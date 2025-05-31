@@ -5,6 +5,7 @@ from colorama import init, Fore, Style
 #from movie_manager import add_movie, delete_movie, update_movie
 from movie_display import (list_movies, stats, random_movie,
                            search_movie, sort_movies, create_rating_histogram)
+from website_generator import generate_website
 
 #from storage_manager import add_movie, delete_movie, update_movie
 import storage_manager as storage

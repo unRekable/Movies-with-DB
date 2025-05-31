@@ -25,10 +25,10 @@ with engine.connect() as connection:
 def get_movies():
     """Retrieve all movies from the database."""
     with engine.connect() as connection:
-        result = connection.execute(text("SELECT title, year, rating FROM movies"))
+        result = connection.execute(text("SELECT title, year, rating, image_url FROM movies"))
         movies = result.fetchall()
 
-    return {row[0]: {"year": row[1], "rating": row[2]} for row in movies}
+    return {row[0]: {"year": row[1], "rating": row[2], "image_url": row[3]} for row in movies}
 
 def add_movie(title):
     """Add a new movie to the database."""
