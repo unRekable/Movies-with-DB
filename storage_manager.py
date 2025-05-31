@@ -33,7 +33,12 @@ def get_movies():
 def add_movie(title):
     """Add a new movie to the database."""
 
-    title, year, rating, image_url = get_movie_by_title(title)
+    movie_data = get_movie_by_title(title)
+
+    if movie_data:
+        title, year, rating, image_url = get_movie_by_title(title)
+    else:
+        return
 
     with engine.connect() as connection:
         try:
