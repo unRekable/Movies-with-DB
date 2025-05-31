@@ -1,4 +1,4 @@
-import statistics, random, os, dotenv
+import statistics, random
 import matplotlib.pyplot as plt
 from collections import Counter
 from colorama import Fore, Style
@@ -6,13 +6,6 @@ from difflib import get_close_matches
 from sqlalchemy import create_engine, text
 import storage_manager as storage
 
-dotenv.load_dotenv()
-
-# Define the database URL
-DB_URL = os.environ.get("DB_URL")
-
-# Create the engine
-engine = create_engine(DB_URL, echo=True)
 
 def list_movies():
      """Display all movies and their ratings from the DB."""
@@ -22,7 +15,7 @@ def list_movies():
          print(f"{Style.BRIGHT}{Fore.WHITE}{movie} ({data['year']}): {data['rating']}")
 
 def stats():
-    """Display average, median, best and worst movie ratings. If multiple movies_db share the highest or lowest rating, all are displayed."""
+    """Display average, median, best and worst movie ratings. If multiple movies share the highest or lowest rating, all are displayed."""
     movies = storage.get_movies()
 
     if not movies:
@@ -46,80 +39,88 @@ def stats():
     worst_movies = [title for title, title_info in movies.items() if title_info['rating'] == min_rating]
 
     best_movies_str = ", ".join(best_movies)
-    best_label = "Best movie" if len(best_movies) == 1 else "Best movies_db"
+    best_label = "Best movie" if len(best_movies) == 1 else "Best movies"
     print(f"{Style.BRIGHT}{Fore.GREEN}{best_label}: {Style.BRIGHT}{Fore.WHITE}{best_movies_str} ({max_rating})")
 
     worst_movies_str = ", ".join(worst_movies)
-    worst_label = "Worst movie" if len(worst_movies) == 1 else "Worst movies_db"
+    worst_label = "Worst movie" if len(worst_movies) == 1 else "Worst movies"
     print(f"{Style.BRIGHT}{Fore.RED}{worst_label}: {Style.BRIGHT}{Fore.WHITE}{worst_movies_str} ({min_rating})")
 
 
-def random_movie(movies_db):
+def random_movie():
     """Select and display a random movie from the database."""
-    if not movies_db:
-        print(f"{Fore.RED}No movies_db in the database to display a random movie.")
+    movies = storage.get_movies()
+
+    if not movies:
+        print(f"{Fore.RED}No movies in the database to display a random movie.")
         return
 
-    title, title_info = random.choice(list(movies_db.items()))
+    title, title_info = random.choice(list(movies.items()))
     print(
         f"{Style.BRIGHT}{Fore.MAGENTA}Your movie for tonight: {title}, it's rated {title_info['rating']} and from {title_info['year']}.")
 
 
-def search_movie(movies_db):
-    """Search for movies_db by title using substring and fuzzy matching."""
-    if not movies_db:
-        print(f"{Fore.RED}No movies_db in the database to search.")
+def search_movie():
+    """Search for movies by title using substring and fuzzy matching."""
+    movies = storage.get_movies()
+
+    if not movies:
+        print(f"{Fore.RED}No movies in the database to search.")
         return
 
     user_search = input(f"{Style.BRIGHT}{Fore.YELLOW}Enter part of the movie name: ")
     found = False
-    for title in movies_db.keys():
+    for title in movies.keys():
         if user_search.lower() in title.lower():
             print(
-                f"{Style.BRIGHT}{Fore.WHITE}{title} ({movies_db[title]['year']}): {movies_db[title]['rating']}")
+                f"{Style.BRIGHT}{Fore.WHITE}{title} ({movies[title]['year']}): {movies[title]['rating']}")
             found = True
 
     if not found:
-        titles = list(movies_db.keys())
+        titles = list(movies.keys())
         suggestions = get_close_matches(user_search, titles, n=5, cutoff=0.3)
         if suggestions:
             print(f'{Fore.RED}\nThe movie "{user_search}" does not exist. Did you mean:')
             for suggestion in suggestions:
                 print(
-                    f"{Style.BRIGHT}{Fore.CYAN}{suggestion}, Year: {movies_db[suggestion]['year']}, Rating: {movies_db[suggestion]['rating']}")
+                    f"{Style.BRIGHT}{Fore.CYAN}{suggestion}, Year: {movies[suggestion]['year']}, Rating: {movies[suggestion]['rating']}")
         else:
             print(f'{Fore.RED}\nNo movie found for "{user_search}".')
 
 
-def sort_movies(movies_db):
-    """Sort and display movies_db by rating in descending order."""
-    if not movies_db:
-        print(f"{Fore.RED}No movies_db in the database to sort.")
+def sort_movies():
+    """Sort and display movies by rating in descending order."""
+    movies = storage.get_movies()
+
+    if not movies:
+        print(f"{Fore.RED}No movies in the database to sort.")
         return
 
     movies_sorted_keys = sorted(
-        movies_db.keys(),
-        key=lambda movie_key: movies_db[movie_key]['rating'],
+        movies.keys(),
+        key=lambda movie_key: movies[movie_key]['rating'],
         reverse=True
     )
 
     print(f"{Style.BRIGHT}{Fore.CYAN}Movies sorted by rating:")
     for movie_key in movies_sorted_keys:
-        rating = movies_db[movie_key].get('rating', 'N/A')
-        year = movies_db[movie_key].get('year', 'N/A')
+        rating = movies[movie_key].get('rating', 'N/A')
+        year = movies[movie_key].get('year', 'N/A')
         print(f"{Style.BRIGHT}{Fore.WHITE}{movie_key} ({year}): {rating}")
 
 
-def create_rating_histogram(movies_db, filename):
+def create_rating_histogram(filename):
     """Create and save a histogram of movie ratings to a file."""
-    if not movies_db:
-        print(f"{Fore.RED}No movies_db in the database to create a histogram.")
+    movies = storage.get_movies()
+
+    if not movies:
+        print(f"{Fore.RED}No movies in the database to create a histogram.")
         return
 
     ratings = []
 
-    for movie in movies_db:
-        ratings.append(movies_db[movie]['rating'])
+    for movie in movies:
+        ratings.append(movies[movie]['rating'])
 
     counts = Counter(ratings)
     sorted_items = sorted(counts.items())
