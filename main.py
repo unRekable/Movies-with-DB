@@ -19,8 +19,6 @@ def main():
         "1": lambda: list_movies(),
         "2": lambda: storage.add_movie(
             input(f"{Style.BRIGHT}{Fore.YELLOW}Enter the new movie name: "),
-            int(input(f"{Style.BRIGHT}{Fore.YELLOW}Enter new movie year: ")),
-            float(input(f"{Style.BRIGHT}{Fore.YELLOW}Enter new movie rating (0-10): "))
         ),
         "3": lambda: storage.delete_movie(
             input(f"{Style.BRIGHT}{Fore.YELLOW}Enter the movie name to delete: ")
@@ -29,7 +27,7 @@ def main():
             input(f"{Style.BRIGHT}{Fore.YELLOW}Enter movie name: "),
             float(input(f"{Style.BRIGHT}{Fore.YELLOW}Enter new movie rating (0-10): "))
         ),
-        "5": lambda: command_stats(),
+        "5": lambda: stats(),
         "6": lambda: random_movie(),
         "7": lambda: search_movie(),
         "8": lambda: sort_movies(),

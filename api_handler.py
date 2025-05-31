@@ -17,7 +17,7 @@ def get_movie_by_title(name):
             print(f"Movie {name} not found, please try again!")
             return
 
-        return result["Title"], result["Year"], result["imdbRating"]
+        return result["Title"], result["Year"], result["imdbRating"], result["Poster"]
 
     except requests.exceptions.HTTPError as error:
         print("HTTP Error: ", error)
@@ -27,5 +27,3 @@ def get_movie_by_title(name):
         print("Connection error: ", error)
     except requests.exceptions.RequestException as error:
         print("Exception request: ", error)
-
-get_movie_by_title("Titanic")

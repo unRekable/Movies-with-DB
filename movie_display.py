@@ -1,4 +1,4 @@
-import statistics, random, os
+import statistics, random, os, dotenv
 import matplotlib.pyplot as plt
 from collections import Counter
 from colorama import Fore, Style
@@ -6,8 +6,10 @@ from difflib import get_close_matches
 from sqlalchemy import create_engine, text
 import storage_manager as storage
 
+dotenv.load_dotenv()
+
 # Define the database URL
-DB_URL = "sqlite:///movies.db"
+DB_URL = os.environ.get("DB_URL")
 
 # Create the engine
 engine = create_engine(DB_URL, echo=True)

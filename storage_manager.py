@@ -1,4 +1,5 @@
 from sqlalchemy import create_engine, text
+from api_handler import get_movie_by_title
 import os, dotenv
 
 dotenv.load_dotenv()
@@ -8,17 +9,18 @@ DB_URL = os.getenv("DB_URL")
 # Create the engine
 engine = create_engine(DB_URL, echo=True)
 
-# # Create the movies table if it does not exist
-# with engine.connect() as connection:
-#     connection.execute(text("""
-#         CREATE TABLE IF NOT EXISTS movies (
-#             id INTEGER PRIMARY KEY AUTOINCREMENT,
-#             title TEXT UNIQUE NOT NULL,
-#             year INTEGER NOT NULL,
-#             rating REAL NOT NULL
-#         )
-#     """))
-#     connection.commit()
+# Create the movies table if it does not exist
+with engine.connect() as connection:
+    connection.execute(text("""
+        CREATE TABLE IF NOT EXISTS movies (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT UNIQUE NOT NULL,
+            year INTEGER NOT NULL,
+            rating REAL NOT NULL,
+            image_url VARCHAR NOT NULL
+        )
+    """))
+    connection.commit()
 
 def get_movies():
     """Retrieve all movies from the database."""
@@ -28,12 +30,15 @@ def get_movies():
 
     return {row[0]: {"year": row[1], "rating": row[2]} for row in movies}
 
-def add_movie(title, year, rating):
+def add_movie(title):
     """Add a new movie to the database."""
+
+    title, year, rating, image_url = get_movie_by_title(title)
+
     with engine.connect() as connection:
         try:
-            connection.execute(text("INSERT INTO movies (title, year, rating) VALUES (:title, :year, :rating)"),
-                               {"title": title, "year": year, "rating": rating})
+            connection.execute(text("INSERT INTO movies (title, year, rating, image_url) VALUES (:title, :year, :rating, :image_url)"),
+                               {"title": title, "year": year, "rating": rating, "image_url": image_url})
             connection.commit()
             print(f"Movie '{title}' added successfully.")
         except Exception as e:
