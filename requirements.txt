@@ -1,6 +1,5 @@
 colorama
 matplotlib
 python-dotenv
-sqlalchemy
-dotenv
 requests
+SQLAlchemy

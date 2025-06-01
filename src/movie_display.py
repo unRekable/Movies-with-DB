@@ -1,9 +1,8 @@
-import statistics, random
+import statistics, random, os
 import matplotlib.pyplot as plt
 from collections import Counter
 from colorama import Fore, Style
 from difflib import get_close_matches
-from sqlalchemy import create_engine, text
 import storage_manager as storage
 
 
@@ -133,6 +132,10 @@ def create_rating_histogram(filename):
     plt.title("Movie Rating Distribution")
     plt.yticks(range(0, max(heights) + 1))
     plt.tight_layout()
-    plt.savefig(filename)
+
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    output_path = os.path.join(project_root, 'output', filename)
+
+    plt.savefig(output_path)
     plt.close()
-    print(f"{Style.BRIGHT}{Fore.GREEN}Histogram saved in {os.getcwd()} as '{filename}'")
+    print(f"{Style.BRIGHT}{Fore.GREEN}Histogram saved to '{output_path}'")

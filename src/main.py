@@ -1,27 +1,29 @@
 import sys
 import textwrap
 from colorama import init, Fore, Style
-#from storage_manager import get_movies
-#from movie_manager import add_movie, delete_movie, update_movie
-from movie_display import (list_movies, stats, random_movie,
-                           search_movie, sort_movies, create_rating_histogram)
-from website_generator import generate_website
-
-#from storage_manager import add_movie, delete_movie, update_movie
 import storage_manager as storage
+from movie_display import (
+    list_movies,
+    stats,
+    random_movie,
+    search_movie,
+    sort_movies,
+    create_rating_histogram
+)
+from website_generator import generate_website
 
 # Initialize colorama for cross-platform terminal color support
 init(autoreset=True)
 
+
 def main():
-    """Main program loop to interact with the user and manage movies_db."""
-    #movies_db = get_movies()
+    """Main program loop to interact with the user and manage the movie database."""
 
     actions = {
         "0": sys.exit,
-        "1": lambda: list_movies(),
+        "1": list_movies,
         "2": lambda: storage.add_movie(
-            input(f"{Style.BRIGHT}{Fore.YELLOW}Enter the new movie name: "),
+            input(f"{Style.BRIGHT}{Fore.YELLOW}Enter the new movie name: ")
         ),
         "3": lambda: storage.delete_movie(
             input(f"{Style.BRIGHT}{Fore.YELLOW}Enter the movie name to delete: ")
@@ -30,15 +32,15 @@ def main():
             input(f"{Style.BRIGHT}{Fore.YELLOW}Enter movie name: "),
             float(input(f"{Style.BRIGHT}{Fore.YELLOW}Enter new movie rating (0-10): "))
         ),
-        "5": lambda: stats(),
-        "6": lambda: random_movie(),
-        "7": lambda: search_movie(),
-        "8": lambda: sort_movies(),
+        "5": stats,
+        "6": random_movie,
+        "7": search_movie,
+        "8": sort_movies,
         "9": lambda: (
-            filename := input(f"{Style.BRIGHT}{Fore.YELLOW}Enter filename to save the histogram (e.g. ratings.png): "),
-            create_rating_histogram(movies_db, filename if filename else "ratings.png")
+            filename := input(f"{Style.BRIGHT}{Fore.YELLOW}Enter filename for histogram (e.g., ratings.png): "),
+            create_rating_histogram(filename if filename else "ratings.png")
         ),
-        "10": lambda: generate_website()
+        "10": generate_website
     }
 
     print(f"{Style.BRIGHT}{Fore.MAGENTA}********** My Movies Database **********")
@@ -60,18 +62,19 @@ def main():
 
     while True:
         print(menu_text)
-        user_choice = input(f"{Style.BRIGHT}{Fore.YELLOW}Enter choice (1-9): ")
+        user_choice = input(f"{Style.BRIGHT}{Fore.YELLOW}Enter choice (0-10): ")
         print()
 
-        if user_choice in actions:
+        action_to_run = actions.get(user_choice)
+        if action_to_run:
             try:
-                action_to_run = actions[user_choice]
                 action_to_run()
             except Exception as e:
                 print(f"{Fore.RED}An unexpected error occurred: {e}")
             input(f"{Style.BRIGHT}{Fore.BLUE}\nPress enter to continue")
         else:
             print(f"{Fore.RED}Invalid choice. Please select from the menu.")
+
 
 if __name__ == "__main__":
     main()

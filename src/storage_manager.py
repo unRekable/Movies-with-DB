@@ -1,13 +1,15 @@
 from sqlalchemy import create_engine, text
 from api_handler import get_movie_by_title
-import os, dotenv
+from colorama import Fore, Style
+import os
 
-dotenv.load_dotenv()
-
-DB_URL = os.getenv("DB_URL")
+# Database URL Path
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+db_path = os.path.join(project_root, 'data', 'movies.db')
+DB_URL = f"sqlite:///{db_path}"
 
 # Create the engine
-engine = create_engine(DB_URL, echo=True)
+engine = create_engine(DB_URL) # echo=True ist gut für Debugging, kann aber für normalen Betrieb entfernt werden
 
 # Create the movies table if it does not exist
 with engine.connect() as connection:
@@ -32,7 +34,6 @@ def get_movies():
 
 def add_movie(title):
     """Add a new movie to the database."""
-
     movie = get_movie_by_title(title)
 
     if movie:
@@ -48,28 +49,38 @@ def add_movie(title):
             connection.execute(text("INSERT INTO movies (title, year, rating, image_url) VALUES (:title, :year, :rating, :image_url)"),
                                {"title": title, "year": year, "rating": rating, "image_url": image_url})
             connection.commit()
-            print(f"Movie '{title}' added successfully.")
+            print(f"{Style.BRIGHT}{Fore.GREEN}Movie '{title}' added successfully.")
         except Exception as e:
-            print(f"Error: {e}")
+            # Spezifisch auf UNIQUE-Verletzung prüfen
+            if "UNIQUE constraint failed" in str(e):
+                print(f"{Style.BRIGHT}{Fore.RED}Error: Movie '{title}' already exists in the database.")
+            else:
+                print(f"{Style.BRIGHT}{Fore.RED}Error adding movie: {e}")
 
 def delete_movie(title):
     """Delete a movie from the database."""
     with engine.connect() as connection:
         try:
-            connection.execute(text("DELETE FROM movies WHERE title = :title"),
-                               {"title": title})
-            connection.commit()
-            print(f"Movie '{title}' deleted successfully.")
+            result = connection.execute(text("DELETE FROM movies WHERE title = :title RETURNING title"), {"title": title})
+            if result.fetchone():
+                connection.commit()
+                print(f"{Style.BRIGHT}{Fore.GREEN}Movie '{title}' deleted successfully.")
+            else:
+                print(f"{Style.BRIGHT}{Fore.RED}Error: Movie '{title}' not found.")
         except Exception as e:
-            print(f"Error: {e}")
+            print(f"{Style.BRIGHT}{Fore.RED}Error deleting movie: {e}")
+
 
 def update_movie(title, rating):
     """Update a movie's rating in the database."""
     with engine.connect() as connection:
         try:
-            connection.execute(text("UPDATE movies SET rating = :rating WHERE title = :title"),
+            result = connection.execute(text("UPDATE movies SET rating = :rating WHERE title = :title RETURNING title"),
                                {"title": title, "rating": rating})
-            connection.commit()
-            print(f"Movie '{title}' updated successfully.")
+            if result.fetchone():
+                connection.commit()
+                print(f"{Style.BRIGHT}{Fore.GREEN}Movie '{title}' updated successfully.")
+            else:
+                 print(f"{Style.BRIGHT}{Fore.RED}Error: Movie '{title}' not found.")
         except Exception as e:
-            print(f"Error: {e}")
+            print(f"{Style.BRIGHT}{Fore.RED}Error updating movie: {e}")

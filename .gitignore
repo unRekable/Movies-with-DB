@@ -1,3 +1,3 @@
 .env
-test_storage.py
+data/test_storage.py
 ratings.png
